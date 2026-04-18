@@ -12,6 +12,9 @@ public class UnitController : MonoBehaviour
     public int AttackPower { get; private set; }
     public int Defense { get; private set; }
 
+    // Индекс выбранной способности
+    public int SelectedAbilityIndex { get; private set; } = 0;
+
     private void Awake()
     {
         if (_heroData == null) return;
@@ -45,6 +48,38 @@ public class UnitController : MonoBehaviour
     }
 
     /// <summary>
+    /// Вызывает способность по её индексу из карточки героя.
+    /// </summary>
+    /// <param name="abilityIndex">Индекс способности в массиве.</param>
+    /// <param name="target">Цель применения способности.</param>
+    public void UseAbility(int abilityIndex, UnitController target)
+    {
+        if (_heroData == null || _heroData.Abilities == null || abilityIndex >= _heroData.Abilities.Length)
+        {
+            Debug.Log("[UnitController] Способность не найдена или карточка пуста!", this);
+            return;
+        }
+
+        AbilityEffect ability = _heroData.Abilities[abilityIndex];
+        ability.Execute(this, target);
+    }
+
+    /// <summary>
+    /// Выбирает способность для применения в следующий ход.
+    /// </summary>
+    public void SelectAbility(int index)
+    {
+        if (_heroData == null || _heroData.Abilities == null || index >= _heroData.Abilities.Length)
+        {
+            Debug.Log("[UnitController] Невозможно выбрать способность: индекс вне диапазона!", this);
+            return;
+        }
+
+        SelectedAbilityIndex = index;
+        Debug.Log($"[UnitController] {UnitName} выбрал способность: {_heroData.Abilities[index].AbilityName}", this);
+    }
+
+    /// <summary>
     /// Получает урон (теперь мы передаем сюда уже "чистый" рассчитанный урон из метода Attack).
     /// </summary>
     /// <param name="damage">Чистый урон для вычитания из HP.</param>
@@ -64,5 +99,15 @@ public class UnitController : MonoBehaviour
     {
         Debug.Log($"[UnitController] {UnitName} погиб!", this);
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Восстанавливает здоровье юниту.
+    /// </summary>
+    /// <param name="amount">Количество HP.</param>
+    public void Heal(int amount)
+    {
+        CurrentHP += amount;
+        CurrentHP = Mathf.Min(CurrentHP, MaxHP); // Защита от перелечивания выше максимума
     }
 }

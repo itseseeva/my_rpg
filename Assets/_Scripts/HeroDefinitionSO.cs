@@ -10,12 +10,11 @@ public class HeroDefinitionSO : ScriptableObject
     [SerializeField] private int _defense = 5;
 
     [Header("Способности")]
-    [SerializeField] private int _attackCount = 1;
+    [SerializeField] private AbilityEffect[] _abilities;
 
-    // Публичные свойства (PascalCase) для безопасного чтения (только Get)
     public string HeroName => _heroName;
     public int MaxHP => _maxHP;
     public int Attack => _attack;
     public int Defense => _defense;
-    public int AttackCount => _attackCount;
+    public AbilityEffect[] Abilities => _abilities;
 }

@@ -16,4 +16,5 @@ MonoBehaviour:
   _maxHP: 100
   _attack: 25
   _defense: 10
-  _attackCount: 1
+  _abilities:
+  - {fileID: 11400000, guid: e16fbb28c2355e048a29efd44194d347, type: 2}

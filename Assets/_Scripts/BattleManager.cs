@@ -32,8 +32,8 @@ public class BattleManager : MonoBehaviour
                 return;
             }
 
-            current.Attack(target);
-            Debug.Log($"[BattleManager] {current.UnitName} атакует {target.UnitName}!", this);
+            current.UseAbility(current.SelectedAbilityIndex, target);
+            // Debug.Log($"[BattleManager] {current.UnitName} атакует {target.UnitName}!", this); // Этот лог можно закомментировать, т.к. способности логируют себя сами.
 
             if (target.CurrentHP <= 0)
             {
@@ -63,8 +63,8 @@ public class BattleManager : MonoBehaviour
                 return;
             }
 
-            current.Attack(target);
-            Debug.Log($"[BattleManager] {current.UnitName} атакует {target.UnitName}!", this);
+            current.UseAbility(current.SelectedAbilityIndex, target);
+            // Debug.Log($"[BattleManager] {current.UnitName} атакует {target.UnitName}!", this);
 
             if (_turnManager.GetFirstAliveHero() == null)
             {
