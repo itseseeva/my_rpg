@@ -5,6 +5,13 @@ public class UnitController : MonoBehaviour
     [Header("Карточка героя")]
     [SerializeField] private HeroDefinitionSO _heroData;
 
+    [Header("UI")]
+    [SerializeField] private HPBarUI _hpBarPrefab;
+    private HPBarUI _hpBar;
+
+    private Renderer _renderer;
+    private Color _defaultColor;
+
     // Свойства (PascalCase) автоматически скрыты в инспекторе и доступны для других скриптов
     public string UnitName { get; private set; }
     public int MaxHP { get; private set; }
@@ -17,6 +24,14 @@ public class UnitController : MonoBehaviour
 
     private void Awake()
     {
+        _renderer = GetComponent<Renderer>();
+        if (_renderer != null)
+        {
+            // Создаём уникальный материал для каждого юнита
+            _renderer.material = new Material(_renderer.material);
+            _defaultColor = _renderer.material.color;
+        }
+
         if (_heroData == null) return;
 
         // Берём данные с карточки.
@@ -27,6 +42,30 @@ public class UnitController : MonoBehaviour
         Defense = _heroData.Defense;
 
         Debug.Log($"[UnitController] {UnitName} появился с {CurrentHP} HP", this);
+    }
+
+    private void Start()
+    {
+        // Создаём HP бар над головой
+        if (_hpBarPrefab != null)
+        {
+            _hpBar = Instantiate(_hpBarPrefab, 
+                    transform.position + Vector3.up * 1.5f, 
+                    Quaternion.identity);
+            _hpBar.transform.localScale = new Vector3(0.012f, 0.02f, 0.02f);
+
+            // Поворачиваем к камере
+            if (Camera.main != null)
+            {
+                _hpBar.transform.LookAt(Camera.main.transform);
+                _hpBar.transform.Rotate(0, 180f, 0);
+            }
+
+            Canvas worldCanvas = GameObject.Find("WorldSpaceCanvas").GetComponent<Canvas>();
+            _hpBar.transform.SetParent(worldCanvas.transform);
+            _hpBar.SetMaxHP(MaxHP);
+            _hpBar.SetHP(MaxHP);
+        }
     }
 
     /// <summary>
@@ -45,6 +84,18 @@ public class UnitController : MonoBehaviour
         int damage = Mathf.Max(1, finalAttack - finalDefense);
         
         target.TakeDamage(damage);
+    }
+
+    /// <summary>
+    /// Возвращает способность героя по индексу, если она существует.
+    /// </summary>
+    public AbilityEffect GetAbility(int index)
+    {
+        if (_heroData == null || _heroData.Abilities == null) 
+            return null;
+        if (index >= _heroData.Abilities.Length) 
+            return null;
+        return _heroData.Abilities[index];
     }
 
     /// <summary>
@@ -86,6 +137,9 @@ public class UnitController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         CurrentHP -= damage;
+
+        if (_hpBar != null)
+            _hpBar.SetHP(CurrentHP);
         
         Debug.Log($"[UnitController] {UnitName} получил {damage} урона. HP: {CurrentHP}/{MaxHP}", this);
 
@@ -109,5 +163,16 @@ public class UnitController : MonoBehaviour
     {
         CurrentHP += amount;
         CurrentHP = Mathf.Min(CurrentHP, MaxHP); // Защита от перелечивания выше максимума
+    }
+
+    /// <summary>
+    /// Устанавливает подсветку юнита (желтый цвет для активного).
+    /// </summary>
+    public void SetHighlight(bool active)
+    {
+        if (_renderer != null)
+        {
+            _renderer.material.color = active ? Color.yellow : _defaultColor;
+        }
     }
 }
