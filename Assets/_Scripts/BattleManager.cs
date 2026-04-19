@@ -26,10 +26,18 @@ public class BattleManager : MonoBehaviour
         UnitController current = _turnManager.GetCurrentUnit();
         if (current == null) return;
 
+        // Тикаем эффекты текущего юнита (героя) перед атакой
+        current.GetComponent<EffectSystem>()?.ProcessEffects();
+
         // Если ход героя — атакуем врага
         if (_turnManager.IsHeroTurn())
         {
-            UnitController target = _turnManager.GetFirstAliveEnemy();
+            UnitController target = TargetingSystem.Instance.GetSelectedTarget();
+
+            // Если никто не выбран — берём первого врага
+            if (target == null)
+                target = _turnManager.GetFirstAliveEnemy();
+
             if (target == null)
             {
                 EndBattle(heroWon: true);
@@ -37,6 +45,7 @@ public class BattleManager : MonoBehaviour
             }
 
             current.UseAbility(current.SelectedAbilityIndex, target);
+            TargetingSystem.Instance.ClearTarget();
             // Debug.Log($"[BattleManager] {current.UnitName} атакует {target.UnitName}!", this); // Этот лог можно закомментировать, т.к. способности логируют себя сами.
 
             if (target.CurrentHP <= 0)
@@ -58,6 +67,9 @@ public class BattleManager : MonoBehaviour
     {
         UnitController current = _turnManager.GetCurrentUnit();
         if (current == null) return;
+
+        // Тикаем эффекты текущего юнита (врага) перед атакой
+        current.GetComponent<EffectSystem>()?.ProcessEffects();
 
         if (!_turnManager.IsHeroTurn())
         {
@@ -91,7 +103,7 @@ public class BattleManager : MonoBehaviour
 
         _turnManager.NextTurn();
         HighlightCurrentUnit();
-        Object.FindFirstObjectByType<BattleUI>()?.RefreshUI();
+        Object.FindAnyObjectByType<BattleUI>()?.RefreshUI();
     }
 
     private void EndBattle(bool heroWon)
@@ -99,7 +111,7 @@ public class BattleManager : MonoBehaviour
         _battleOver = true;
 
         // Убираем кнопки способностей
-        Object.FindFirstObjectByType<BattleUI>()?.gameObject.SetActive(false);
+        Object.FindAnyObjectByType<BattleUI>()?.gameObject.SetActive(false);
 
         if (heroWon)
         {

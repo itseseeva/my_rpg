@@ -7,8 +7,8 @@ public class TurnOrderManager : MonoBehaviour
     [SerializeField] private List<UnitController> _heroTeam = new List<UnitController>();
     [SerializeField] private List<UnitController> _enemyTeam = new List<UnitController>();
 
-    public IReadOnlyList<UnitController> HeroTeam => _heroTeam;
-    public IReadOnlyList<UnitController> EnemyTeam => _enemyTeam;
+    public List<UnitController> HeroTeam => _heroTeam;
+    public List<UnitController> EnemyTeam => _enemyTeam;
 
     private List<UnitController> _turnQueue = new List<UnitController>();
     private int _currentTurnIndex = 0;
