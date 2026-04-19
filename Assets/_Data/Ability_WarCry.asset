@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426fb5a83b6520c4d8bebad2be223e6c, type: 3}
   m_Name: Ability_WarCry
   m_EditorClassIdentifier: Assembly-CSharp::WarCryEffect
-  _abilityName: "\u0421\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C"
+  _abilityName: "\u0411\u043E\u0435\u0432\u043E\u0439 \u043A\u043B\u0438\u0447"
   _description: "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0441\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u0438"
   _attackBonus: 15
   _duration: 3

@@ -152,6 +152,10 @@ public class UnitController : MonoBehaviour
     private void Die()
     {
         Debug.Log($"[UnitController] {UnitName} погиб!", this);
+        if (GridSystem.Instance != null)
+        {
+            GridSystem.Instance.RemoveUnit(this);
+        }
         gameObject.SetActive(false);
     }
 
