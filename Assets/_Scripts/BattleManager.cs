@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
+    [Header("Загрузка составов")]
+    public LoadoutResolver loadoutResolver;
+
     [Header("Менеджер очереди")]
     [SerializeField] private TurnOrderManager _turnManager;
 
@@ -12,6 +15,11 @@ public class BattleManager : MonoBehaviour
 
     private void Start()
     {
+        // Применяем артефакты перед боем
+        loadoutResolver?.ApplyAllLoadouts(
+            _turnManager.HeroTeam as System.Collections.Generic.List<UnitController>,
+            _turnManager.EnemyTeam as System.Collections.Generic.List<UnitController>);
+
         Debug.Log("[BattleManager] === БОЙ НАЧАЛСЯ ===", this);
         HighlightCurrentUnit();
     }
