@@ -179,8 +179,8 @@ public class SaveSystem : MonoBehaviour
     {
         HeroSaveData hero = GetOrCreateHeroData(heroId);
 
-        // Максимум 4 слота
-        if (hero.equippedArtifactIds.Count >= 4)
+        // Максимум 6 слотов
+        if (hero.equippedArtifactIds.Count >= 6)
         {
             Debug.Log($"[Save] У {heroId} все слоты заняты!");
             return false;
