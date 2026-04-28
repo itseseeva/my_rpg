@@ -6,6 +6,7 @@ public class HeroSaveData
     public string heroId;
     public int level;
     public int experience;
+    public int statPoints;      // Очки для распределения по статам
     public int strength;
     public int intellect;
     public int agility;

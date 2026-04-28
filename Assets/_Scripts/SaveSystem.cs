@@ -217,4 +217,99 @@ public class SaveSystem : MonoBehaviour
         Debug.Log($"[Save] {heroId} снял: {artifactId}");
         return true;
     }
+    /// <summary>
+    /// Снимает все артефакты с героя за один вызов (для "Надеть лучшее").
+    /// </summary>
+    public void UnequipAllArtifacts(string heroId)
+    {
+        HeroSaveData hero = GetOrCreateHeroData(heroId);
+        hero.equippedArtifactIds.Clear();
+        Save();
+        Debug.Log($"[Save] {heroId}: все артефакты сняты");
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  ПРОКАЧКА ГЕРОЯ
+    // ═══════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Начисляет опыт герою. Автоматически повышает уровень и даёт
+    /// 3 очка статов за каждый новый уровень.
+    /// </summary>
+    public void AddXP(string heroId, int amount)
+    {
+        HeroSaveData hero = GetOrCreateHeroData(heroId);
+
+        // Если уже максимальный уровень — XP не начисляем
+        if (hero.level >= HeroStatsCalculator.MaxLevel)
+        {
+            Debug.Log($"[Save] {heroId}: максимальный уровень достигнут!");
+            return;
+        }
+
+        hero.experience += amount;
+
+        // Проверяем не поднялся ли уровень
+        int newLevel = HeroStatsCalculator.GetLevel(hero.experience);
+        if (newLevel > hero.level)
+        {
+            int levelsGained  = newLevel - hero.level;
+            int pointsGranted = levelsGained * 3;
+            hero.level      = newLevel;
+            hero.statPoints += pointsGranted;
+
+            Debug.Log($"[Save] {heroId} ▲ Уровень {newLevel}! " +
+                      $"+{pointsGranted} очков статов. " +
+                      $"Итого очков: {hero.statPoints}", this);
+        }
+        else
+        {
+            Debug.Log($"[Save] {heroId}: +{amount} XP " +
+                      $"(итого {hero.experience})", this);
+        }
+
+        Save();
+    }
+
+    /// <summary>
+    /// Тратит 1 очко стата на выбранный стат героя.
+    /// statName: "strength" | "agility" | "intellect" | "endurance"
+    /// Возвращает true если успешно потрачено.
+    /// </summary>
+    public bool SpendStatPoint(string heroId, string statName)
+    {
+        HeroSaveData hero = GetOrCreateHeroData(heroId);
+
+        if (hero.statPoints <= 0)
+        {
+            Debug.Log($"[Save] {heroId}: нет очков статов!", this);
+            return false;
+        }
+
+        switch (statName)
+        {
+            case "strength":  hero.strength++;  break;
+            case "agility":   hero.agility++;   break;
+            case "intellect": hero.intellect++;  break;
+            case "endurance": hero.endurance++; break;
+            default:
+                Debug.Log($"[Save] Неизвестный стат: {statName}", this);
+                return false;
+        }
+
+        hero.statPoints--;
+        Save();
+        Debug.Log($"[Save] {heroId}: +1 {statName} " +
+                  $"(осталось очков: {hero.statPoints})", this);
+        return true;
+    }
+
+    /// <summary>
+    /// Возвращает количество свободных очков статов у героя.
+    /// </summary>
+    public int GetStatPoints(string heroId)
+    {
+        return GetOrCreateHeroData(heroId).statPoints;
+    }
 }
+

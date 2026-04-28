@@ -69,11 +69,23 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Создаёт кнопку артефакта в списке.
+    /// Создаёт кнопку артефакта в списке и окрашивает её по редкости.
+    /// Если префаб содержит ArtifactSlotUI — делегируем ему всю работу.
+    /// Иначе — откат к текстовому отображению.
     /// </summary>
     private void CreateItemButton(ArtifactDefinitionSO artifact)
     {
         GameObject itemGO = Instantiate(_itemPrefab, _itemsContainer);
+
+        // ── Попытка использовать ArtifactSlotUI ──
+        ArtifactSlotUI slotUI = itemGO.GetComponent<ArtifactSlotUI>();
+        if (slotUI != null)
+        {
+            slotUI.Setup(artifact);
+            return;
+        }
+
+        // ── Откат: просто текст ──
         TextMeshProUGUI text = itemGO.GetComponentInChildren<TextMeshProUGUI>();
         if (text != null)
         {
@@ -81,6 +93,12 @@ public class InventoryUI : MonoBehaviour
                        $"⚔️+{artifact.bonusAttack}  " +
                        $"🛡️+{artifact.bonusDefense}  " +
                        $"❤️+{artifact.bonusHP}";
+            text.color = RarityColorHelper.GetBorderColor(artifact.rarity);
         }
+
+        // Окрашиваем фон самой кнопки в цвет редкости (полупрозрачно)
+        Image bg = itemGO.GetComponent<Image>();
+        if (bg != null)
+            bg.color = RarityColorHelper.GetBackgroundColor(artifact.rarity);
     }
 }
